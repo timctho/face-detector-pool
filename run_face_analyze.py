@@ -5,7 +5,7 @@ import argparse
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--detector', type=str, default='dlib')
-parser.add_argument('--input', type=str, default='1.jpg')
+parser.add_argument('--input', type=str, default='Yuniko')
 parser.add_argument('--viz', type=bool, default=True)
 
 args = parser.parse_args()
