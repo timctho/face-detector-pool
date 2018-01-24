@@ -7,7 +7,7 @@ import json
 class FaceAnalyzer(object):
     def __init__(self, face_detector):
         self.face_detector = face_detector
-        self._bbox_expand_ratio = 0.25
+        self._bbox_expand_ratio = 0.3
 
     @property
     def bbox_expand_ratio(self):
@@ -18,50 +18,54 @@ class FaceAnalyzer(object):
         self._bbox_expand_ratio = val
 
     def full_analyze(self, input):
-        self.root_dir = input + '_analyze'
-        return self._full_analyze(self.root_dir, input)
-
-    def _full_analyze(self, root_dir, input):
-        res_faces = []
-        res_landmarks = []
-
-        if input.endswith(('.jpg', '.png')):
-            return self._analyze_single_image('/'.join(root_dir.split('/')[:-1]), input)
-
         if os.path.isdir(input):
-            self._create_dir(root_dir)
-            self._img_cnt_in_dir = 0
-            self.json_log = {}
-            for sub_input in os.listdir(input):
-                tmp_faces, tmp_landmarks = self._full_analyze(os.path.join(root_dir, sub_input),
-                                                              os.path.join(input, sub_input))
-                res_faces += tmp_faces
-                res_landmarks += tmp_landmarks
-                self.json_log['{}.jpg'.format(self._img_cnt_in_dir-1)] = tmp_landmarks
-            with open(os.path.join(root_dir, 'facial_landmarks.json'), 'w') as f:
-                json.dump(self.json_log, f)
-            return res_faces, res_landmarks
+            self.input_root = input
         else:
-            return [], []
+            self.input_root = './'
+        output_root = 'output/'
+        self.res_faces = []
+        self.res_landmarks = []
+        self.json_log = {}
+        self._img_cnt_in_dir = 0
+        self._full_analyze(self.input_root, input, output_root)
+        with open('face_metadata.json', 'w') as f:
+            json.dump(self.json_log, f)
+        return self.res_faces, self.res_landmarks
 
-    def _analyze_single_image(self, root_dir, image):
-        res_faces = []
-        res_landmarks = []
-        image = cv2.imread(image)
+    def _full_analyze(self, root_dir, input, output_root):
+
+        if os.path.isdir(root_dir):
+            self._create_dir(output_root)
+        if input.endswith(('.jpg', '.png')):
+            self._analyze_single_image(
+                input,
+                '/'.join(output_root.split('/')[:-1]))
+            return
+        if os.path.isdir(input):
+            for sub_input in os.listdir(input):
+                self._full_analyze(os.path.join(root_dir, sub_input),
+                                   os.path.join(input, sub_input),
+                                   os.path.join(output_root, sub_input))
+        return
+
+    def _analyze_single_image(self, image_path, output_root):
+        image = cv2.imread(image_path)
         bboxes = self.face_detector.detect_faces(image)
+        print('Detect {} faces in [{}]'.format(len(bboxes), image_path))
         for bbox in bboxes:
-            landmarks = self.face_detector.detect_facial_landmarks(image, bbox).parts()
+            landmarks = self.face_detector.detect_facial_landmarks(image, bbox)
 
             img_h, img_w, _ = image.shape
             expand_top, expand_left, expand_bot, expand_right = self._expand_bbox(bbox, img_h, img_w)
             cropped_face = image[expand_top:expand_bot, expand_left:expand_right, :]
             landmarks = [[landmarks[i].x - expand_left, landmarks[i].y - expand_top]
                          for i in range(len(landmarks))]
-            res_faces.append(cropped_face)
-            res_landmarks.append(landmarks)
-            cv2.imwrite(os.path.join(root_dir, '{}.jpg'.format(self._img_cnt_in_dir)), cropped_face)
+            img_path = os.path.join(output_root, '{}.jpg'.format(self._img_cnt_in_dir))
+            self.res_faces.append(cropped_face)
+            self.res_landmarks.append(landmarks)
+            self.json_log[img_path] = landmarks
+            cv2.imwrite(img_path, cropped_face)
             self._img_cnt_in_dir += 1
-        return res_faces, res_landmarks
 
     def _expand_bbox(self, bbox, img_h, img_w):
         h = bbox.bottom() - bbox.top()
@@ -75,15 +79,3 @@ class FaceAnalyzer(object):
         if not os.path.exists(folder):
             os.mkdir(folder)
 
-
-if __name__ == '__main__':
-    face_analyzer = FaceAnalyzer(DlibFaceDetector())
-    faces, landmarks = face_analyzer.full_analyze('tmp0')
-    print(len(faces))
-
-    for i in range(len(faces)):
-        for j in range(len(landmarks[i])):
-            cv2.circle(faces[i], center=(landmarks[i][j][0], landmarks[i][j][1]), radius=2, color=(255, 0, 0),
-                       thickness=-1)
-            cv2.imshow('', faces[i])
-            cv2.waitKey(0)
