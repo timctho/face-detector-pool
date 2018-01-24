@@ -26,13 +26,13 @@
 
 * Use class
 
- Create **FaceAnalyzer()** instance with a detector
+ Create **FaceAnalyzer()** instance with a detector.
  
- Run **full_analyze()** will return detected **faces** and related **facial landmarks**
+ Run **full_analyze()** will return detected **faces** and related **facial landmarks**.
  
  
  
 
 ## Outputs
-* Detected face will be cropped and saved into `output` folder
-* Related landmarks will be saved into `face_metadata.json` with `<key, value> = <img_path, landmarks>`
+* Detected face will be cropped and saved into `output` folder.
+* Related landmarks will be saved into `face_metadata.json` with `<key, value> = <img_path, landmarks>`.
