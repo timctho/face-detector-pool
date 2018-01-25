@@ -24,8 +24,7 @@
 
  `python run_face_analyze.py --detector <method> --input <image file or folder> --viz <visualize or not>`
 
-
- `python run_face_analyze.py --detector dlib --input Yuniko --viz True`
+ For example, `python run_face_analyze.py --detector dlib --input Yuniko --viz True`
 
 * Use high level class
 
