@@ -1,5 +1,8 @@
 # Face Detector Pool
 * Implement common face detection algorithms.
+<p align="center">
+    <img src="https://github.com/timctho/dlib-face-detector/raw/master/twice.jpg", width="480">
+</p>
 
 <p align="center">
     <img src="https://github.com/timctho/dlib-face-detector/raw/master/sample.jpg", width="320">
