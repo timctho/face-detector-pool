@@ -14,7 +14,7 @@
  
 ## Current methods
  - Dlib
- - MTCNN (TODO)
+ - MTCNN
 
 ## Usage
 * Use scripts
