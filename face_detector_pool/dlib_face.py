@@ -1,29 +1,17 @@
 import dlib
-import abc
-
-
-class BaseFaceDetector(metaclass=abc.ABCMeta):
-
-    @abc.abstractmethod
-    def detect_faces(self, image):
-        """
-        Detect faces of an single image
-        """
-        return NotImplementedError
-
-    @abc.abstractmethod
-    def detect_facial_landmarks(self, image):
-        """
-        Detect facial landmarks of an single image
-        """
-        return NotImplementedError
-
+from face_detector_pool.base_face_detector import BaseFaceDetector
 
 class DlibFaceDetector(BaseFaceDetector):
-    def __init__(self, facial_model_path='shape_predictor_68_face_landmarks.dat'):
+    def __init__(self, facial_model_path='model_weights/shape_predictor_68_face_landmarks.dat'):
         self.face_model = dlib.get_frontal_face_detector()
         self.facial_landmark_model = dlib.shape_predictor(facial_model_path)
-        self._threshold = 0.2
+        self._threshold = 0.4
+
+
+    @property
+    def name(self):
+        return 'dlib'
+
 
     @property
     def threshold(self):
@@ -61,13 +49,3 @@ class DlibFaceDetector(BaseFaceDetector):
 
 
 
-class MTCNNDetector(BaseFaceDetector):
-    def __init__(self):
-        super(MTCNNDetector, self).__init__()
-
-
-    def detect_faces(self, image):
-        """TODO"""
-
-    def detect_facial_landmarks(self, image):
-        """TODO"""
