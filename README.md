@@ -27,13 +27,15 @@
 
  `python run_face_analyze.py --detector dlib --input Yuniko --viz True`
 
-* Use class
+* Use high level class
 
- Create **FaceAnalyzer()** instance with a detector.
+  - Create **FaceAnalyzer()** instance with a detector.
  
- Run **full_analyze()** will return detected **faces** and related **facial landmarks**.
+  - Run **full_analyze()** will return detected **faces** and related **facial landmarks**.
  
- 
+* Use detector api
+  - **detect_faces()** return face bounding boxes.
+  - **detect_facial_landmarks()** return facial landmarks.
  
 
 ## Outputs
